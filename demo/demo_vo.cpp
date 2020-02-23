@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "../config_parse/config_parser.h"
+#include "core/config_parse/config_parser.h"
 
 using namespace std;
 

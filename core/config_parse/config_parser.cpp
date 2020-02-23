@@ -8,7 +8,7 @@ using namespace std;
 
 namespace myslam {
 
-bool ConfigParser::setParameterFile(const std::string file_path) {
+bool ConfigParser::setParameterFile(const std::string& file_path) {
     if (config_parser_ == nullptr) {
         config_parser_ = shared_ptr<ConfigParser>(new ConfigParser);
     }
