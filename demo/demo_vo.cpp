@@ -18,10 +18,10 @@ int main(int argc, char** argv) {
         return -2;
     }
 
-    string dataset_dir = myslam::ConfigParser::get<string>("dataset_dir");
-    std::cout << "dataset dir is: " << dataset_dir << std::endl;
+    string dataset_path = myslam::ConfigParser::get<string>("dataset_path");
+    std::cout << "dataset dir is: " << dataset_path << std::endl;
 
-    string img_list_path = dataset_dir + "/list.txt";
+    string img_list_path = dataset_path + "/list.txt";
     ifstream in(img_list_path);
     if (!in.is_open()) {
         cerr << "No image list file!" << endl;
