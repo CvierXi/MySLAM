@@ -1,8 +1,26 @@
 #include <iostream>
 
 #include "core/config_parse/config_parser.h"
+#include "odometry/homo_odometry.h"
+#include "core/dataset_parse/vo_dataset_parser.h"
 
 using namespace std;
+using namespace myslam;
+
+class A {
+public:
+    explicit A(std::string dataset_path) {}
+//    virtual ~A() = default;
+    virtual void parseData() {};
+};
+
+class B : A {
+public:
+    explicit B(std::string dataset_path) : A(dataset_path) {}
+    void parseData() override {
+        std::cout << "parseData" << std::endl;
+    }
+};
 
 int main(int argc, char** argv) {
     std::cout << "Hello, World!" << std::endl;
@@ -21,6 +39,11 @@ int main(int argc, char** argv) {
     string dataset_path = myslam::ConfigParser::get<string>("dataset_path");
     std::cout << "dataset dir is: " << dataset_path << std::endl;
 
+    unique_ptr<BaseOdometry> odo = make_unique<HomoOdometry>(config_file_path);
+    odo->runOdometry();
+
+    return 0;
+
     string img_list_path = dataset_path + "/list.txt";
     ifstream in(img_list_path);
     if (!in.is_open()) {
@@ -28,17 +51,6 @@ int main(int argc, char** argv) {
         return -3;
     }
     string img_name;
-    while (getline(in, img_name)) {
-        cout << "===== " << img_name << endl;
-        string img_path;
-        img_path.append(dataset_dir).append("/cam/").append(img_name);
-        cv::Mat img = cv::imread(img_path);
-        if (img.empty()) {
-            continue;
-        }
-        cv::imshow("img", img);
-        cv::waitKey(100);
-    }
 
     cout << "Done!" << endl;
 
