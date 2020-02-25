@@ -9,14 +9,13 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 include(cmake_modules/FindOpenCV.cmake)
 
-add_subdirectory(core)
 add_subdirectory(odometry)
-set(DEMO_LIBS ${DEMO_LIBS} ${THIRD_LIBS} libcore libodometry)
+set(DEMO_LIBS ${DEMO_LIBS} ${THIRD_LIBS} libodometry)
 
-set(EXE_SIMPLE_NAME "demo_simple")
-add_executable(${EXE_SIMPLE_NAME} demo/demo_simple.cpp)
-target_link_libraries(${EXE_SIMPLE_NAME} ${DEMO_LIBS})
+#set(EXE_SIMPLE_NAME "demo_simple")
+#add_executable(${EXE_SIMPLE_NAME} demo/demo_simple.cpp)
+#target_link_libraries(${EXE_SIMPLE_NAME} ${DEMO_LIBS})
 
-set(EXE_DEMO_NAME "demo_vo")
-add_executable(${EXE_DEMO_NAME} demo/demo_vo.cpp)
+set(EXE_DEMO_NAME "demo_vo_homo")
+add_executable(${EXE_DEMO_NAME} demo/demo_vo_homo.cpp)
 target_link_libraries(${EXE_DEMO_NAME} ${DEMO_LIBS})

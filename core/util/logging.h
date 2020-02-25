@@ -33,6 +33,12 @@ const char* const LOG_MAPPING[] = {
         "I",
         "E",
 };
+const int COLOR_MAPPING[] = {
+        0,  // default
+//        33, // yellow
+        32, // green
+        31, //red
+};
 #endif
 inline void PrintFunc(const char* user_tag, int severity ...) {
     if (severity == SLAM_DEBUG || severity == SLAM_INFO || severity == SLAM_ERROR) {
@@ -42,13 +48,14 @@ inline void PrintFunc(const char* user_tag, int severity ...) {
 #ifdef SLAM_USING_ANDROID
         ((void) __android_log_vprint(common::ANDROID_LOG_MAPPING[severity], LOG_TAG, fmt, args));
 #else
-        printf("%s(%s)-[%s]: ", LOG_TAG, LOG_MAPPING[severity], user_tag);
+//        printf("%s(%s)-[%s]: ", LOG_TAG, LOG_MAPPING[severity], user_tag);
+        printf("\033[%dm%s(%s)-[%s]: ", COLOR_MAPPING[severity], LOG_TAG, LOG_MAPPING[severity], user_tag);
         vprintf(fmt, args);
         fflush(stdout);
 #endif
         va_end(args);
     }
-    printf("\n");
+    printf("\033[0m\n");
 }
 #define SLAM_LOG_FUNC(user_tag, severity, ...) PrintFunc(user_tag, severity, __VA_ARGS__)
 

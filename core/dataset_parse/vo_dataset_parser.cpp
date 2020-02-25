@@ -9,9 +9,11 @@ using namespace std;
 using namespace myslam;
 
 VoDatasetParser::VoDatasetParser(const string& dataset_path) : BaseDatasetParser(dataset_path) {
-
 }
 
-void VoDatasetParser::parseData() {
-    LOGI(TAG, "parseData ...");
+bool VoDatasetParser::parseData() {
+    LOGD(TAG, "parseData ...");
+    bool flag = parseImgData();
+    LOGD(TAG, "parseData finished.");
+    return flag;
 }

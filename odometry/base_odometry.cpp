@@ -3,16 +3,19 @@
 //
 
 #include "base_odometry.h"
-#include "core/dataset_parse/vo_dataset_parser.h"
 
 using namespace std;
+using namespace myslam;
 
-namespace myslam {
+BaseOdometry::BaseOdometry(const string& config_file_path) {
+}
 
-//void BaseOdometry::runOdometry() {
-//    shared_ptr<BaseDatasetParser> dataset_parser = make_shared<VoDatasetParser>("hhh");
-//    dataset_parser->parseData();
-//    cout << "runOdometry" << endl;
-//}
+void BaseOdometry::imgCallback(const myslam::ImgData &img_data) {
+    img_ = img_data.img;
+    if (img_.channels() > 1) {
+        cv::cvtColor(img_, img_, cv::COLOR_BGR2GRAY);
+    }
+}
 
+void BaseOdometry::imuCallback(const myslam::ImuData &imu_data) {
 }

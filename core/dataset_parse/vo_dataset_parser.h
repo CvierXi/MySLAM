@@ -12,7 +12,7 @@ namespace myslam {
 class VoDatasetParser : public BaseDatasetParser {
 public:
     explicit VoDatasetParser(const std::string& dataset_path);
-    void parseData() override;
+    bool parseData() override;
 
 private:
     const char* TAG = "VoDatasetParser";

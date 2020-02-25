@@ -12,12 +12,18 @@ namespace myslam {
 
 class BaseOdometry {
 public:
-    explicit BaseOdometry(std::string config_file_path) {}
+    explicit BaseOdometry(const std::string& config_file_path);
     virtual ~BaseOdometry() = default;
     virtual void runOdometry() = 0;
 
 protected:
+    virtual void imgCallback(const ImgData& img_data);
+    virtual void imuCallback(const ImuData& imu_data);
     std::unique_ptr<BaseDatasetParser> dataset_parser_;
+    cv::Mat img_;
+
+private:
+    const char* TAG = "BaseOdometry";
 };
 
 }

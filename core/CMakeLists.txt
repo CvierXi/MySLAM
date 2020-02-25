@@ -10,3 +10,4 @@ aux_source_directory(./dataset_parse DIR_DATASET_PARSE)
 set(DIR_CORE ${DIR_CORE} ${DIR_DATASET_PARSE})
 
 add_library(libcore ${DIR_CORE})
+target_link_libraries(libcore ${THIRD_LIBS})
