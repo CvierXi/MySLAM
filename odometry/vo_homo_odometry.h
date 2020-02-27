@@ -18,6 +18,7 @@ public:
 
 protected:
     void imgCallback(const ImgData& img_data) override;
+    Pose getCameraPose() override;
 
 private:
     const char* TAG = "HomoOdometry";

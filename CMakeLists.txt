@@ -13,7 +13,7 @@ include(cmake_modules/FindOpenCV.cmake)
 include_directories(${PROJECT_SOURCE_DIR})
 
 add_subdirectory(odometry)
-set(DEMO_LIBS ${DEMO_LIBS} ${THIRD_LIBS} libodometry)
+set(DEMO_LIBS ${DEMO_LIBS} odometry)
 
 
 #set(EXE_SIMPLE_NAME "demo_simple")

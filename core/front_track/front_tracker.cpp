@@ -20,6 +20,7 @@ FrontTracker::FrontTracker(FrontConfig &config) : config_(config) {
 void FrontTracker::imgCallback(const cv::Mat &img) {
     prev_pyr_ = next_pyr_;
     prev_pts_ = next_pts_;
+    next_pyr_.clear();
     cv::buildOpticalFlowPyramid(img, next_pyr_, pyr_win_size_, config_.pyr_max_level);
     if (!prev_pyr_.empty()) {
         trackFeatures();
@@ -29,7 +30,9 @@ void FrontTracker::imgCallback(const cv::Mat &img) {
     addFeatures();
 }
 
-void FrontTracker::getTrackPoints(vector<cv::Point2f> &track_src_pts, vector<cv::Point2f> &track_dst_pts) {
+void FrontTracker::getTrackPoints(vector<cv::Point2f>& track_src_pts, vector<cv::Point2f>& track_dst_pts) {
+//    track_src_pts.assign(track_src_pts_.begin(), track_src_pts_.end());
+//    track_dst_pts.assign(track_dst_pts_.begin(), track_dst_pts_.end());
     track_src_pts = track_src_pts_;
     track_dst_pts = track_dst_pts_;
 }

@@ -3,5 +3,5 @@
 add_subdirectory(../core Core)
 
 aux_source_directory(. DIR_ODOMETRY)
-add_library(libodometry ${DIR_ODOMETRY})
-target_link_libraries(libodometry libcore)
+add_library(odometry ${DIR_ODOMETRY})
+target_link_libraries(odometry core)

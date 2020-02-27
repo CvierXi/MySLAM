@@ -1,5 +1,8 @@
 # - LIB_CORE
 
+aux_source_directory(./camera DIR_CAMERA)
+set(DIR_CORE ${DIR_CORE} ${DIR_CAMERA})
+
 aux_source_directory(./config_parse DIR_CONFIG_PARSE)
 set(DIR_CORE ${DIR_CORE} ${DIR_CONFIG_PARSE})
 
@@ -12,5 +15,5 @@ set(DIR_CORE ${DIR_CORE} ${DIR_FRONT_TRACK})
 aux_source_directory(./util DIR_UTIL)
 set(DIR_CORE ${DIR_CORE} ${DIR_UTIL})
 
-add_library(libcore ${DIR_CORE})
-target_link_libraries(libcore ${THIRD_LIBS})
+add_library(core ${DIR_CORE})
+target_link_libraries(core ${THIRD_LIBS})

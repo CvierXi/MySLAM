@@ -6,20 +6,21 @@
 #define MYSLAM_BASE_ODOMETRY_H
 
 #include "core/common.h"
+#include "core/camera/camera.h"
 #include "core/dataset_parse/base_dataset_parser.h"
 #include "core/front_track/front_tracker.h"
 
 namespace myslam {
-
-class BaseOdometry {
 
 struct Pose {
     V3f p;
     Q4f q;
 
     Pose();
+    Pose(V3f& _p, Q4f& _q);
 };
 
+class BaseOdometry {
 public:
     explicit BaseOdometry(const std::string& config_file_path);
     virtual ~BaseOdometry() = default;
@@ -28,7 +29,8 @@ public:
 protected:
     virtual void imgCallback(const ImgData& img_data);
     virtual void imuCallback(const ImuData& imu_data);
-    virtual void getPose();
+    virtual Pose getCameraPose();
+    std::unique_ptr<Camera> camera_;
     std::unique_ptr<BaseDatasetParser> dataset_parser_;
     std::unique_ptr<FrontTracker> front_tracker_;
     cv::Mat img_;
