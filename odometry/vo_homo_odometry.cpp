@@ -20,6 +20,13 @@ HomoOdometry::HomoOdometry(const string& config_file_path) : BaseOdometry(config
     if (!dataset_parser_->parseData()) {
         dataset_parser_ = nullptr;
     }
+
+    FrontTracker::FrontConfig config;
+    config.feature_threshold = ConfigParser::get<int>("feature_threshold");
+    config.feature_max_num = ConfigParser::get<int>("feature_max_num");
+    config.pyr_max_level = ConfigParser::get<int>("pyr_max_level");
+    config.pyr_win_size = ConfigParser::get<int>("pyr_win_size");
+    front_tracker_ = make_unique<FrontTracker>(config);
 }
 
 void HomoOdometry::runOdometry() {
@@ -33,8 +40,7 @@ void HomoOdometry::runOdometry() {
         if (!img_data.is_valid) {
             continue;
         }
-        cv::imshow("img", img_data.img);
-        cv::waitKey(50);
+        cv::imshow("img_raw", img_data.img);
         imgCallback(img_data);
     }
     LOGI(TAG, "runOdometry finished.");
@@ -42,5 +48,7 @@ void HomoOdometry::runOdometry() {
 
 void HomoOdometry::imgCallback(const ImgData &img_data) {
     BaseOdometry::imgCallback(img_data);
-
+    cv::imshow("img_", img_);
+    front_tracker_->imgCallback(img_);
+    cv::waitKey();
 }

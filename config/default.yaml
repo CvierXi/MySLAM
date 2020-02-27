@@ -1,3 +1,10 @@
 %YAML:1.0
+
 # dataset_path
-dataset_path:/home/sunxi/ws/00_dataset/01
+dataset_path: /home/sunxi/ws/00_dataset/01
+
+# front_track_config
+feature_threshold: 10
+feature_max_num: 50
+pyr_max_level: 3
+pyr_win_size: 21

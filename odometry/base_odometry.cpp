@@ -3,6 +3,7 @@
 //
 
 #include "base_odometry.h"
+#include "core/util/util.h"
 
 using namespace std;
 using namespace myslam;
@@ -12,9 +13,7 @@ BaseOdometry::BaseOdometry(const string& config_file_path) {
 
 void BaseOdometry::imgCallback(const myslam::ImgData &img_data) {
     img_ = img_data.img;
-    if (img_.channels() > 1) {
-        cv::cvtColor(img_, img_, cv::COLOR_BGR2GRAY);
-    }
+    cvtColorColor2Gray(img_);
 }
 
 void BaseOdometry::imuCallback(const myslam::ImuData &imu_data) {

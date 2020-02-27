@@ -14,5 +14,17 @@ double imgName2Timestamp(std::string img_name) {
     return timestamp;
 }
 
+void cvtColorGray2Color(cv::Mat& img) {
+    if (img.channels() == 1) {
+        cv::cvtColor(img, img, cv::COLOR_GRAY2BGR);
+    }
+}
+
+void cvtColorColor2Gray(cv::Mat& img) {
+    if (img.channels() > 1) {
+        cv::cvtColor(img, img, cv::COLOR_BGR2GRAY);
+    }
+}
+
 }
 

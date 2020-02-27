@@ -17,7 +17,7 @@ public:
     void runOdometry() override;
 
 protected:
-    void imgCallback(const ImgData& img_data);
+    void imgCallback(const ImgData& img_data) override;
 
 private:
     const char* TAG = "HomoOdometry";

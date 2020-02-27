@@ -11,6 +11,9 @@ namespace myslam {
 
 double imgName2Timestamp(std::string img_name);
 
+void cvtColorGray2Color(cv::Mat& img);
+void cvtColorColor2Gray(cv::Mat& img);
+
 }
 
 #endif //MYSLAM_UTIL_H
