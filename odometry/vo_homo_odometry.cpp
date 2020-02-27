@@ -21,7 +21,7 @@ HomoOdometry::HomoOdometry(const string& config_file_path) : BaseOdometry(config
         dataset_parser_ = nullptr;
     }
 
-    FrontTracker::FrontConfig config;
+    FrontTracker::FrontConfig config{};
     config.feature_threshold = ConfigParser::get<int>("feature_threshold");
     config.feature_max_num = ConfigParser::get<int>("feature_max_num");
     config.pyr_max_level = ConfigParser::get<int>("pyr_max_level");
@@ -35,7 +35,7 @@ void HomoOdometry::runOdometry() {
         return;
     }
     int img_num = dataset_parser_->getImgNum();
-    for (int i=0;i<img_num;i++) {
+    for (int i = 0; i < img_num; i++) {
         ImgData img_data = dataset_parser_->getImgDataAt(i);
         if (!img_data.is_valid) {
             continue;
@@ -50,5 +50,15 @@ void HomoOdometry::imgCallback(const ImgData &img_data) {
     BaseOdometry::imgCallback(img_data);
     cv::imshow("img_", img_);
     front_tracker_->imgCallback(img_);
-    cv::waitKey();
+
+    vector<cv::Point2f> track_src_pts, track_dst_pts;
+    cv::Mat H_cv = cv::findHomography(track_src_pts, track_dst_pts, cv::RANSAC, 2);
+    M3f H;
+    cv::cv2eigen(H_cv, H);
+    cout << H << endl;
+
+    int ch = imshow_pause_ ? cv::waitKey() : cv::waitKey(50);
+    if (ch == 'p' || ch == 'P') {
+        imshow_pause_ = !imshow_pause_;
+    }
 }

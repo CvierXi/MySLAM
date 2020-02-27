@@ -29,17 +29,23 @@ void FrontTracker::imgCallback(const cv::Mat &img) {
     addFeatures();
 }
 
+void FrontTracker::getTrackPoints(vector<cv::Point2f> &track_src_pts, vector<cv::Point2f> &track_dst_pts) {
+    track_src_pts = track_src_pts_;
+    track_dst_pts = track_dst_pts_;
+}
+
+
 void FrontTracker::trackFeatures() {
     int n = prev_pts_.size();
-    track_ref_pts_.clear();
     track_src_pts_.clear();
+    track_dst_pts_.clear();
     vector<cv::Point2f> klt_next_kps;
     vector<uchar> klt_status;
     cv::calcOpticalFlowPyrLK(prev_pyr_, next_pyr_, prev_pts_, klt_next_kps, klt_status, cv::noArray(), pyr_win_size_, config_.pyr_max_level);
     for (int i = 0; i < n; i++) {
         if (klt_status[i]) {
-            track_ref_pts_.push_back(prev_pts_[i]);
-            track_src_pts_.push_back(klt_next_kps[i]);
+            track_src_pts_.push_back(prev_pts_[i]);
+            track_dst_pts_.push_back(klt_next_kps[i]);
         }
     }
 }
@@ -66,14 +72,14 @@ void FrontTracker::addFeatures() {
 
 void FrontTracker::drawOpticalFlow() {
     cv::Mat dis_track, dis_opt_flow;
-    dis_opt_flow = next_pyr_[0].clone();
+//    dis_opt_flow = next_pyr_[0].clone();
     cv::hconcat(prev_pyr_[0], next_pyr_[0], dis_track);
     cvtColorGray2Color(dis_track);
-    cvtColorGray2Color(dis_opt_flow);
-    int n = track_ref_pts_.size();
+//    cvtColorGray2Color(dis_opt_flow);
+    int n = track_src_pts_.size();
     for (int i = 0; i < n; i++) {
-        cv::Point2f ref_pt(track_ref_pts_[i].x, track_ref_pts_[i].y);
-        cv::Point2f src_pt(track_src_pts_[i].x, track_src_pts_[i].y);
+        cv::Point2f ref_pt(track_src_pts_[i].x, track_src_pts_[i].y);
+        cv::Point2f src_pt(track_dst_pts_[i].x, track_dst_pts_[i].y);
         cv::Point2f dis_pt(src_pt.x + prev_pyr_[0].cols, src_pt.y);
         cv::circle(dis_track, ref_pt, 3, cv::Scalar(255, 0, 0));
         cv::circle(dis_track, dis_pt, 3, cv::Scalar(255, 0, 0));

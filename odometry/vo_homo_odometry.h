@@ -21,6 +21,7 @@ protected:
 
 private:
     const char* TAG = "HomoOdometry";
+    bool imshow_pause_ = true;
 };
 
 }

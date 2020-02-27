@@ -5,10 +5,7 @@
 #ifndef MYSLAM_CONFIG_PARSER_H
 #define MYSLAM_CONFIG_PARSER_H
 
-#include <iostream>
-#include <memory>
-
-#include "opencv2/opencv.hpp"
+#include "core/common.h"
 
 namespace myslam {
 

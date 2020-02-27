@@ -5,12 +5,16 @@ set(CMAKE_CXX_STANDARD 14)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-include_directories(${PROJECT_SOURCE_DIR})
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 include(cmake_modules/FindOpenCV.cmake)
 
+include_directories(${PROJECT_SOURCE_DIR})
+
 add_subdirectory(odometry)
 set(DEMO_LIBS ${DEMO_LIBS} ${THIRD_LIBS} libodometry)
+
 
 #set(EXE_SIMPLE_NAME "demo_simple")
 #add_executable(${EXE_SIMPLE_NAME} demo/demo_simple.cpp)
