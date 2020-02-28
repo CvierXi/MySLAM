@@ -23,6 +23,7 @@ protected:
 private:
     const char* TAG = "HomoOdometry";
     bool imshow_pause_ = true;
+    M3d cur_H_ = M3d::Identity();
 };
 
 }

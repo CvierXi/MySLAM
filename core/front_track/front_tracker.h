@@ -16,6 +16,7 @@ public:
         int feature_max_num;
         int pyr_max_level;
         int pyr_win_size;
+        bool enable_show_optical_flow;
     };
 
     explicit FrontTracker(FrontConfig& config);

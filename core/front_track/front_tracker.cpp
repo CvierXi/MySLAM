@@ -2,6 +2,7 @@
 // Created by sunxi on 2/26/20.
 //
 
+#include <algorithm>
 #include <numeric>
 
 #include "front_tracker.h"
@@ -11,10 +12,27 @@
 using namespace std;
 using namespace myslam;
 
+#define FRONT_FEATURE_TH_MIN 10
+#define FRONT_FEATURE_TH_MAX 30
+#define FRONT_PYR_LEVEL_MIN 0
+#define FRONT_PYR_LEVEL_MAX 3
+#define FRONT_PYR_WIN_SIZE_DEFAULT 21
+
 FrontTracker::FrontTracker(FrontConfig &config) : config_(config) {
+    if (config_.feature_threshold < FRONT_FEATURE_TH_MIN || config_.feature_threshold > FRONT_FEATURE_TH_MAX) {
+        LOGE(TAG, "Input parameter - 'feature_threshold' must in [%d, %d]; now use default value: %d", FRONT_FEATURE_TH_MIN, FRONT_FEATURE_TH_MAX, FRONT_FEATURE_TH_MIN);
+        config_.feature_threshold = FRONT_FEATURE_TH_MIN;
+    }
     fast_detector_ = cv::FastFeatureDetector::create(config_.feature_threshold);
-    int win_size = (config_.pyr_win_size % 2 != 0) ? config_.pyr_win_size : 21;
-    pyr_win_size_ = cv::Size(win_size, win_size);
+    if (config_.pyr_max_level < FRONT_PYR_LEVEL_MIN || config_.pyr_max_level > FRONT_PYR_LEVEL_MAX) {
+        LOGE(TAG, "Input parameter - 'pyr_max_level' must in [%d, %d]; now use default value: %d", FRONT_PYR_LEVEL_MIN, FRONT_PYR_LEVEL_MAX, FRONT_PYR_LEVEL_MAX);
+        config_.pyr_max_level = FRONT_PYR_LEVEL_MAX;
+    }
+    if (config_.pyr_win_size % 2 == 0) {
+        LOGE(TAG, "Input parameter - 'pyr_win_size' must be odd; now use default value: %d", FRONT_PYR_WIN_SIZE_DEFAULT);
+        config_.pyr_win_size = FRONT_PYR_WIN_SIZE_DEFAULT;
+    }
+    pyr_win_size_ = cv::Size(config_.pyr_win_size, config_.pyr_win_size);
 }
 
 void FrontTracker::imgCallback(const cv::Mat &img) {
@@ -24,7 +42,7 @@ void FrontTracker::imgCallback(const cv::Mat &img) {
     cv::buildOpticalFlowPyramid(img, next_pyr_, pyr_win_size_, config_.pyr_max_level);
     if (!prev_pyr_.empty()) {
         trackFeatures();
-        LOGD(TAG, "trackFeatures result: %d -> %d", prev_pts_.size(), track_src_pts_.size());
+//        LOGD(TAG, "trackFeatures result: %d -> %d", prev_pts_.size(), track_src_pts_.size());
         drawOpticalFlow();
     }
     addFeatures();
@@ -67,13 +85,19 @@ void FrontTracker::addFeatures() {
     iota(std::begin(idx), std::end(idx), 0);
     cv::sortIdx(kp_responses, idx, CV_SORT_DESCENDING);
 
-    for (int i = 0; i< config_.feature_max_num; i++) {
+    int num_new_kps = kps.size();
+    int num_new_features = min(config_.feature_max_num, num_new_kps);
+    for (int i = 0; i < num_new_features; i++) {
         next_pts_.emplace_back(kps[idx[i]].pt.x, kps[idx[i]].pt.y);
     }
-    LOGD(TAG, "addFeatures result: %d -> %d", num_pts, next_pts_.size());
+//    LOGD(TAG, "addFeatures result: %d -> %d", num_pts, next_pts_.size());
 }
 
 void FrontTracker::drawOpticalFlow() {
+    if (!config_.enable_show_optical_flow) {
+        return;
+    }
+
     cv::Mat dis_track, dis_opt_flow;
 //    dis_opt_flow = next_pyr_[0].clone();
     cv::hconcat(prev_pyr_[0], next_pyr_[0], dis_track);

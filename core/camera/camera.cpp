@@ -13,14 +13,14 @@ Camera::Camera(float fx, float fy, float cx, float cy) {
           0,  0,  1;
 }
 
-Camera::Camera(M3f& K) : K_(K) {
+Camera::Camera(M3d& K) : K_(K) {
 }
 
-void Camera::setK(M3f &K) {
+void Camera::setK(M3d &K) {
     K_ = K;
 }
 
-M3f Camera::K() {
+M3d Camera::K() {
     return K_;
 }
 

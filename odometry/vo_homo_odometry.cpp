@@ -6,6 +6,7 @@
 #include "core/config_parse/config_parser.h"
 #include "core/dataset_parse/vo_dataset_parser.h"
 #include "core/util/logging.h"
+#include "core/util/util.h"
 
 using namespace std;
 using namespace myslam;
@@ -19,9 +20,9 @@ HomoOdometry::HomoOdometry(const string& config_file_path) : BaseOdometry(config
     dataset_parser_ = make_unique<VoDatasetParser>(dataset_path);
     if (!dataset_parser_->parseData()) {
         dataset_parser_ = nullptr;
+        return;
     }
 
-    M3f K;
     auto fx = ConfigParser::get<float>("camera.fx");
     auto fy = ConfigParser::get<float>("camera.fy");
     auto cx = ConfigParser::get<float>("camera.cx");
@@ -33,7 +34,13 @@ HomoOdometry::HomoOdometry(const string& config_file_path) : BaseOdometry(config
     config.feature_max_num = ConfigParser::get<int>("feature_max_num");
     config.pyr_max_level = ConfigParser::get<int>("pyr_max_level");
     config.pyr_win_size = ConfigParser::get<int>("pyr_win_size");
+    config.enable_show_optical_flow = ConfigParser::get<int>("enable_show_optical_flow");
     front_tracker_ = make_unique<FrontTracker>(config);
+
+#ifdef HAVE_VIZ
+    viser_ = make_unique<Visualizer>();
+    viser_->addCamera(camera_->K());
+#endif
 }
 
 void HomoOdometry::runOdometry() {
@@ -47,9 +54,10 @@ void HomoOdometry::runOdometry() {
         if (!img_data.is_valid) {
             continue;
         }
-        cv::imshow("img_raw", img_data.img);
+//        cv::imshow("img_raw", img_data.img);
         imgCallback(img_data);
     }
+    viser_->hold();
     LOGI(TAG, "runOdometry finished.");
 }
 
@@ -58,6 +66,10 @@ void HomoOdometry::imgCallback(const ImgData &img_data) {
     cv::imshow("img_", img_);
     front_tracker_->imgCallback(img_);
     Pose pose = getCameraPose();
+#ifdef HAVE_VIZ
+    cv::Point3d cam_pos(pose.p(0), pose.p(1), pose.p(2));
+    viser_->updateCameraPose(pose.q.toRotationMatrix(), pose.p);
+#endif
 
     int ch = imshow_pause_ ? cv::waitKey() : cv::waitKey(50);
     if (ch == 'p' || ch == 'P') {
@@ -72,29 +84,13 @@ Pose HomoOdometry::getCameraPose() {
         return BaseOdometry::getCameraPose();
     }
 
-    cv::Mat K_cv;
-    cv::eigen2cv(camera_->K(), K_cv);
-
-//    cv::Mat H_cv = cv::findHomography(track_src_pts, track_dst_pts, cv::RANSAC, 2);
-//    vector<cv::Mat> rotations, translations, normals;
-//    cv::decomposeHomographyMat(H_cv, K_cv, rotations, translations, normals);
-//    if (rotations.size() > 1) {
-//        LOGE(TAG, "Failed to decomposeHomographyMat, #solutions = %d", rotations.size());
-//        return BaseOdometry::getCameraPose();
-//    }
-//    cv::Mat R_cv = rotations[0];
-//    cv::Mat t_cv = translations[0];
-
-    cv::Mat R_cv, t_cv, mask_cv;
-    cv::Mat E_cv = cv::findEssentialMat(track_src_pts, track_dst_pts, K_cv, cv::RANSAC, 0.999, 1.0, mask_cv);
-    cv::recoverPose(E_cv, track_src_pts, track_dst_pts, K_cv, R_cv, t_cv, mask_cv);
-
-    M3f R;
-    V3f p;
-    cv::cv2eigen(R_cv, R);
-    cv::cv2eigen(t_cv, p);
-    Q4f q(R);
-    cout << p.transpose() << endl;
-    return {p, q};
+    /// p2 = H * p1
+    cv::Mat H_cv = cv::findHomography(track_src_pts, track_dst_pts, cv::RANSAC, 2);
+    M3d H, R;
+    V3d t;
+    cv::cv2eigen(H_cv, H);
+    cur_H_ = H * cur_H_;
+    recoverPoseFromHomography(cur_H_, R, t);
+    return {t / 100, Q4d(R)};
 }
 

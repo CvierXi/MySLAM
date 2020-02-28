@@ -12,16 +12,16 @@ namespace myslam {
 class Camera {
 public:
     explicit Camera(float fx, float fy, float cx, float cy);
-    explicit Camera(M3f& K);
-    void setK(M3f& K);
-    M3f K();
+    explicit Camera(M3d& K);
+    void setK(M3d& K);
+    M3d K();
     float fx();
     float fy();
     float cx();
     float cy();
 
 private:
-    M3f K_;
+    M3d K_;
 };
 
 }

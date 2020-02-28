@@ -14,9 +14,9 @@
 
 namespace myslam {
 
-typedef Eigen::Vector3f V3f;
-typedef Eigen::Matrix3f M3f;
-typedef Eigen::Quaternionf Q4f;
+typedef Eigen::Vector3d V3d;
+typedef Eigen::Matrix3d M3d;
+typedef Eigen::Quaterniond Q4d;
 
 }
 

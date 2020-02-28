@@ -9,11 +9,11 @@ using namespace std;
 using namespace myslam;
 
 Pose::Pose() {
-    p = V3f(0, 0, 0);
-    q = Q4f(1, 0, 0 ,0);
+    p = V3d(0, 0, 0);
+    q = Q4d(1, 0, 0 , 0);
 }
 
-Pose::Pose(V3f& _p, Q4f& _q) : p(_p), q(_q) {
+Pose::Pose(V3d _p, Q4d _q) : p(_p), q(_q) {
 }
 
 BaseOdometry::BaseOdometry(const string& config_file_path) {

@@ -10,14 +10,19 @@
 #include "core/dataset_parse/base_dataset_parser.h"
 #include "core/front_track/front_tracker.h"
 
+#ifdef HAVE_VIZ
+#include "visualize/visualizer.h"
+#endif
+
 namespace myslam {
 
 struct Pose {
-    V3f p;
-    Q4f q;
+    V3d p;
+    Q4d q;
 
     Pose();
-    Pose(V3f& _p, Q4f& _q);
+    Pose(V3d _p, Q4d _q);
+
 };
 
 class BaseOdometry {
@@ -34,6 +39,9 @@ protected:
     std::unique_ptr<BaseDatasetParser> dataset_parser_;
     std::unique_ptr<FrontTracker> front_tracker_;
     cv::Mat img_;
+#ifdef HAVE_VIZ
+    std::unique_ptr<Visualizer> viser_;
+#endif
 
 private:
     const char* TAG = "BaseOdometry";
