@@ -35,12 +35,14 @@ protected:
     virtual void imgCallback(const ImgData& img_data);
     virtual void imuCallback(const ImuData& imu_data);
     virtual Pose getCameraPose();
+
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<BaseDatasetParser> dataset_parser_;
     std::unique_ptr<FrontTracker> front_tracker_;
     cv::Mat img_;
+    bool is_inited_;
 #ifdef HAVE_VIZ
-    std::unique_ptr<Visualizer> viser_;
+    std::unique_ptr<Visualizer> visualizer_;
 #endif
 
 private:

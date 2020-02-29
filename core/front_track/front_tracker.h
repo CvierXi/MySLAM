@@ -22,6 +22,7 @@ public:
     explicit FrontTracker(FrontConfig& config);
     void imgCallback(const cv::Mat& img);
     void getTrackPoints(std::vector<cv::Point2f>& track_src_pts, std::vector<cv::Point2f>& track_dst_pts);
+    void getTrackPointsNormalized(std::vector<cv::Point2f>& track_src_pts, std::vector<cv::Point2f>& track_dst_pts);
 
 private:
     void trackFeatures();

@@ -17,11 +17,14 @@ class Visualizer {
 public:
     Visualizer();
 
-    void addCamera(const M3d& K);
-    void updateCameraPose(const M3d& wRc, const V3d& wtc);
+    void addCamera(const M3d& K, const Point3d& init_camera_pos);
+    void addCamera(const M3d& K, const V3d& p_r);
+    void updateCameraPose(const M3d& r_R_c, const V3d& r_t_c);
     void hold();
 
 private:
+    Point3d getPointInWorld(const V3d& p_r);
+
     viz::Viz3d myWindow_;
     viz::WCameraPosition cpw_; // Coordinate axes
     viz::WCameraPosition cpw_frustum_; // Camera frustum

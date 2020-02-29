@@ -55,24 +55,44 @@ void FrontTracker::getTrackPoints(vector<cv::Point2f>& track_src_pts, vector<cv:
     track_dst_pts = track_dst_pts_;
 }
 
+void FrontTracker::getTrackPointsNormalized(vector<cv::Point2f>& track_src_pts, vector<cv::Point2f>& track_dst_pts) {
+    int num_pts = track_src_pts_.size();
+    if (num_pts == 0) {
+        return;
+    }
+    int img_w = prev_pyr_[0].cols;
+    int img_h = prev_pyr_[0].rows;
+    for (int i = 0; i < num_pts; i++) {
+        cv::Point2f track_src_pt(2.0f * track_src_pts_[i].x / img_w - 1, 2.0f * track_src_pts_[i].y / img_h - 1);
+        cv::Point2f track_dst_pt(2.0f * track_dst_pts_[i].x / img_w - 1, 2.0f * track_dst_pts_[i].y / img_h - 1);
+        track_src_pts.push_back(track_src_pt);
+        track_dst_pts.push_back(track_dst_pt);
+    }
+}
+
 
 void FrontTracker::trackFeatures() {
     int n = prev_pts_.size();
     track_src_pts_.clear();
     track_dst_pts_.clear();
-    vector<cv::Point2f> klt_next_kps;
-    vector<uchar> klt_status;
-    cv::calcOpticalFlowPyrLK(prev_pyr_, next_pyr_, prev_pts_, klt_next_kps, klt_status, cv::noArray(), pyr_win_size_, config_.pyr_max_level);
+    vector<cv::Point2f> klt_next_pts, klt_back_pts;
+    vector<uchar> klt_next_status, klt_back_status;
+    cv::calcOpticalFlowPyrLK(prev_pyr_, next_pyr_, prev_pts_, klt_next_pts, klt_next_status, cv::noArray(), pyr_win_size_, config_.pyr_max_level);
+    cv::calcOpticalFlowPyrLK(next_pyr_, prev_pyr_, klt_next_pts, klt_back_pts, klt_back_status, cv::noArray(), pyr_win_size_, config_.pyr_max_level);
     for (int i = 0; i < n; i++) {
-        if (klt_status[i]) {
-            track_src_pts_.push_back(prev_pts_[i]);
-            track_dst_pts_.push_back(klt_next_kps[i]);
+        if (klt_next_status[i] && klt_back_status[i]) {
+            double back_error = (klt_back_pts[i] - prev_pts_[i]).dot((klt_back_pts[i] - prev_pts_[i]));
+            if (back_error < 0.25) {
+                track_src_pts_.push_back(prev_pts_[i]);
+                track_dst_pts_.push_back(klt_next_pts[i]);
+            }
         }
     }
 }
 
 void FrontTracker::addFeatures() {
     next_pts_.clear();
+//    next_pts_.assign(track_dst_pts_.begin(), track_dst_pts_.end());
     int num_pts = next_pts_.size();
     vector<cv::KeyPoint> kps;
     fast_detector_->detect(next_pyr_[0], kps);
@@ -86,7 +106,8 @@ void FrontTracker::addFeatures() {
     cv::sortIdx(kp_responses, idx, CV_SORT_DESCENDING);
 
     int num_new_kps = kps.size();
-    int num_new_features = min(config_.feature_max_num, num_new_kps);
+    int num_new_features = min(config_.feature_max_num - num_pts, num_new_kps);
+//    LOGD(TAG, "addFeatures request: %d", num_new_features);
     for (int i = 0; i < num_new_features; i++) {
         next_pts_.emplace_back(kps[idx[i]].pt.x, kps[idx[i]].pt.y);
     }

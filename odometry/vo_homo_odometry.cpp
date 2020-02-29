@@ -38,8 +38,7 @@ HomoOdometry::HomoOdometry(const string& config_file_path) : BaseOdometry(config
     front_tracker_ = make_unique<FrontTracker>(config);
 
 #ifdef HAVE_VIZ
-    viser_ = make_unique<Visualizer>();
-    viser_->addCamera(camera_->K());
+    visualizer_ = make_unique<Visualizer>();
 #endif
 }
 
@@ -56,20 +55,37 @@ void HomoOdometry::runOdometry() {
         }
 //        cv::imshow("img_raw", img_data.img);
         imgCallback(img_data);
+        if (!is_inited_) {
+            is_inited_ = true;
+        }
     }
-    viser_->hold();
     LOGI(TAG, "runOdometry finished.");
+#ifdef HAVE_VIZ
+    visualizer_->hold();
+#endif
 }
 
 void HomoOdometry::imgCallback(const ImgData &img_data) {
     BaseOdometry::imgCallback(img_data);
-    cv::imshow("img_", img_);
+    cv::imshow("imgCallback", img_);
     front_tracker_->imgCallback(img_);
     Pose pose = getCameraPose();
+
 #ifdef HAVE_VIZ
-    cv::Point3d cam_pos(pose.p(0), pose.p(1), pose.p(2));
-    viser_->updateCameraPose(pose.q.toRotationMatrix(), pose.p);
+    if (!is_inited_) {
+//        visualizer_->addCamera(camera_->K(), cv::Point3f(pose.p(0), pose.p(1), pose.p(2)));
+        visualizer_->addCamera(camera_->K(), pose.p);
+    } else {
+        visualizer_->updateCameraPose(pose.q.toRotationMatrix(), pose.p);
+    }
 #endif
+
+//    cv::Mat img_raw = img_data.img;
+//    Q4d q_m;
+//    q_m.setIdentity();
+//    V3d p_m(0, 0, 0);
+//    DrawCube(img_raw, pose.q.toRotationMatrix(), pose.p, q_m.toRotationMatrix(), p_m, camera_->K(), 1);
+//    cv::imshow("ar", img_raw);
 
     int ch = imshow_pause_ ? cv::waitKey() : cv::waitKey(50);
     if (ch == 'p' || ch == 'P') {
@@ -79,18 +95,20 @@ void HomoOdometry::imgCallback(const ImgData &img_data) {
 
 Pose HomoOdometry::getCameraPose() {
     vector<cv::Point2f> track_src_pts, track_dst_pts;
-    front_tracker_->getTrackPoints(track_src_pts, track_dst_pts);
-    if (track_src_pts.empty()) {
-        return BaseOdometry::getCameraPose();
+    front_tracker_->getTrackPointsNormalized(track_src_pts, track_dst_pts);
+    if (is_inited_ && !track_src_pts.empty()) {
+        /// p2 = H * p1
+        /// But notice that, camera moving right, pts in image moving left.
+        cv::Mat H_cv = cv::findHomography(track_src_pts, track_dst_pts, cv::RANSAC, 0.1);
+        M3d H;
+        cv::cv2eigen(H_cv, H);
+        cur_H_ = H * cur_H_;
     }
 
-    /// p2 = H * p1
-    cv::Mat H_cv = cv::findHomography(track_src_pts, track_dst_pts, cv::RANSAC, 2);
-    M3d H, R;
+    M3d R;
     V3d t;
-    cv::cv2eigen(H_cv, H);
-    cur_H_ = H * cur_H_;
     recoverPoseFromHomography(cur_H_, R, t);
-    return {t / 100, Q4d(R)};
+    /// in image0 coordinate
+    return {-t, Q4d(R).inverse()};
 }
 

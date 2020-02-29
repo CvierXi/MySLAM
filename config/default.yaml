@@ -1,13 +1,15 @@
 %YAML:1.0
 
 # dataset_path
-dataset_path: /home/sunxi/ws/00_dataset/01
+dataset_path: /home/sunxi/ws/00_dataset/06
 
 # camera_config
 camera.fx: 526.6667
 camera.fy: 526.6667
 camera.cx: 313.3333
 camera.cy: 240.0
+#camera.cx: 240.0
+#camera.cy: 313.3333
 
 # front_track_config
 feature_threshold: 10
