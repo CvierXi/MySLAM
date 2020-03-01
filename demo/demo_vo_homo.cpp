@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 
     string config_file_path = argv[1];
 
-    unique_ptr<BaseOdometry> odo = make_unique<HomoOdometry>(config_file_path);
+    unique_ptr<BaseOdometry> odo = make_unique<VoHomoOdometry>(config_file_path);
     odo->runOdometry();
 
     cout << "Done!" << endl;

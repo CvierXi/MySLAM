@@ -17,9 +17,8 @@ class Visualizer {
 public:
     Visualizer();
 
-    void addCamera(const M3d& K, const Point3d& init_camera_pos);
-    void addCamera(const M3d& K, const V3d& p_r);
-    void updateCameraPose(const M3d& r_R_c, const V3d& r_t_c);
+    void addCamera(const M3d& K);
+    void updateCameraPose(const M3d& R_rc, const V3d& t_rc);
     void hold();
 
 private:

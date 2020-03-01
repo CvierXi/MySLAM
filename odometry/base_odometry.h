@@ -40,7 +40,6 @@ protected:
     std::unique_ptr<BaseDatasetParser> dataset_parser_;
     std::unique_ptr<FrontTracker> front_tracker_;
     cv::Mat img_;
-    bool is_inited_;
 #ifdef HAVE_VIZ
     std::unique_ptr<Visualizer> visualizer_;
 #endif

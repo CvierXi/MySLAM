@@ -11,9 +11,9 @@ using namespace std;
 
 namespace myslam {
 
-class HomoOdometry : public BaseOdometry {
+class VoHomoOdometry : public BaseOdometry {
 public:
-    explicit HomoOdometry(const std::string& dataset_path);
+    explicit VoHomoOdometry(const std::string& dataset_path);
     void runOdometry() override;
 
 protected:
@@ -21,9 +21,15 @@ protected:
     Pose getCameraPose() override;
 
 private:
+    void drawAR(cv::Mat& img);
+
     const char* TAG = "HomoOdometry";
     bool imshow_pause_ = true;
     M3d cur_H_ = M3d::Identity();
+    cv::Point3i click_pt_;
+    V3d anchor_pixel_ = V3d::Zero();
+    V3d anchor_pixel_1 = V3d::Zero();
+    V3d anchor_pixel_2 = V3d::Zero();
 
     void DrawCube(cv::Mat& image,
                   const Eigen::Matrix3d& wRc,
