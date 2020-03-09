@@ -38,10 +38,10 @@ void Visualizer::updateCameraPose(const M3d& R_rc, const V3d& t_rc) {
     cv::Vec3d cam_focal_point = getPointInWorld(cam_z_unit_r);
     cv::Vec3d cam_y_dir = getPointInWorld(cam_y_unit_r);
 
-    if (line_id > 0) {
-        viz::WLine line(last_camera_pos_, cam_pos, cv::viz::Color::green());
-        myWindow_.showWidget("LINE" + std::to_string(line_id), line);
-    }
+//    if (line_id > 0) {
+//        viz::WLine line(last_camera_pos_, cam_pos, cv::viz::Color::green());
+//        myWindow_.showWidget("LINE" + std::to_string(line_id), line);
+//    }
     Affine3f cam_pose = viz::makeCameraPose(cam_pos, cam_focal_point, cam_y_dir);
     last_camera_pos_ = cam_pos;
     line_id++;
