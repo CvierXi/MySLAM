@@ -16,4 +16,3 @@ aux_source_directory(./util DIR_UTIL)
 set(DIR_CORE ${DIR_CORE} ${DIR_UTIL})
 
 add_library(core ${DIR_CORE})
-target_link_libraries(core ${THIRD_LIBS})
