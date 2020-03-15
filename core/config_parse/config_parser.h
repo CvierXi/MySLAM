@@ -5,10 +5,7 @@
 #ifndef MYSLAM_CONFIG_PARSER_H
 #define MYSLAM_CONFIG_PARSER_H
 
-#include <iostream>
-#include <memory>
-
-#include "opencv2/opencv.hpp"
+#include "core/common.h"
 
 namespace myslam {
 
@@ -16,7 +13,7 @@ class ConfigParser {
 public:
     ~ConfigParser();
 
-    static bool setParameterFile(const std::string file_path);
+    static bool setParameterFile(const std::string& file_path);
 
     template <typename T>
     static T get(const std::string& key) {
